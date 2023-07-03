@@ -1,4 +1,5 @@
 import java.util.LinkedList;
+import java.util.Random;
 
 public class Game {
     int hills_left, mountains_left = 3;
@@ -36,6 +37,30 @@ public class Game {
      * corresponding *_left attribute
      * */
     private Tile insertNewTile() {
-
-    }
+        Random random = new Random();
+        int total_left = hills_left + mountains_left + forests_left + fields_left + pastures_left + deserts_left;
+        if(total_left == 0){
+            return null;
+        }
+        int tileNumber = random.nextInt(total_left) + 1; // +1 makes it easier to match
+        Tile.Resource resource;
+        if(tileNumber >= (total_left = total_left - deserts_left)){
+            resource = Tile.Resource.DESERT;
+            deserts_left--;
+        } else if(tileNumber >= (total_left = total_left - pastures_left)){
+            resource = Tile.Resource.PASTURE;
+            pastures_left--;
+        } else if(tileNumber >= (total_left = total_left - fields_left)){
+            resource = Tile.Resource.FIELDS;
+            fields_left--;
+        } else if(tileNumber >= (total_left = total_left - forests_left)){
+            resource = Tile.Resource.FOREST;
+            forests_left--;
+        } else if(tileNumber >= (total_left = total_left - mountains_left)){
+            resource = Tile.Resource.MOUNTAINS;
+            mountains_left--;
+        } else {
+            resource = Tile.Resource.HILLS;
+            hills_left--;
+        }
 }
