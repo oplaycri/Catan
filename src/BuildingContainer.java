@@ -11,4 +11,12 @@ public class BuildingContainer {
         building = b;
         owner = p;
     }
+
+    public Building getBuilding() {
+        return building;
+    }
+
+    public Player getOwner() {
+        return owner;
+    }
 }

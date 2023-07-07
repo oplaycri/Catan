@@ -1,3 +1,4 @@
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Random;
@@ -6,6 +7,7 @@ public class Map {
     int hills_left, mountains_left = 3;
     int forests_left, fields_left, pastures_left = 4;
     int deserts_left = 1;
+    LinkedList<Integer> numbers = (LinkedList<Integer>) Arrays.asList(2, 3, 3, 4, 4, 5, 5, 6, 6, 8, 8, 9, 9, 10, 10, 11, 11, 12);
     boolean neigh_filled = false;
     LinkedList<Tile> tiles = new LinkedList<>();
 
@@ -13,13 +15,11 @@ public class Map {
         Tile start = getNewTile();
         tiles.add(start);
         fillSurroundingTiles(start);
-        Object[] Iteration = start.getNeighbours();
-        for (Object o : Iteration) {
-            fillSurroundingTiles((Tile) o);
+        for (Tile tile : tiles) {
+            fillSurroundingTiles(tile);
         }
-        Iteration = tiles.toArray();
-        for (Object o : Iteration) {
-            fillSurroundingTiles((Tile) o);
+        for (Tile tile : tiles) {
+            fillSurroundingTiles(tile);
         }
 
         while (!neigh_filled) {
@@ -33,6 +33,9 @@ public class Map {
         }
         for (Tile tile : tiles) {
             fillEdges(tile);
+        }
+        for (Tile tile : tiles) {
+            fillNumbers(tile);
         }
     }
 
@@ -69,6 +72,9 @@ public class Map {
             if (neighbours[i].getResource() != Tile.Resource.WATER){
                 tiles.add(neighbours[i]);
             }
+            if (neighbours[i].getResource() == Tile.Resource.DESERT){
+                neighbours[i].setRaided(true);
+            }
             int relPos = (i + 3) % 6;
             neighbours[i].setNeighbour(relPos, t);
         }
@@ -88,6 +94,47 @@ public class Map {
                 if (neighbour == null) {
                     neigh_filled = false;
                     break;
+                }
+            }
+        }
+    }
+    private void fillNumbers(Tile t){
+        if(t.getResource() == Tile.Resource.DESERT || t.getResource() == Tile.Resource.WATER){
+            return;
+        }
+        Random random = new Random();
+        int index = random.nextInt(numbers.size());
+        t.setN(numbers.get(index));
+        numbers.remove(index);
+    }
+    private void updateResources(Tile t, int diceRoll){
+        if (t.isRaided()||t.getN()==-1){
+            return;
+        }
+        Junction[] junctions = t.getJunctions();
+        for (Junction j: junctions){
+            BuildingContainer.Building building = j.getBuilding();
+            if(building == null){
+                continue;
+            }
+            Player owner = j.getOwner();
+            int amount;
+            switch (building){
+                case Settlement -> amount = 1;
+                case City -> amount = 2;
+            }
+            Tile.Resource resource = t.getResource();
+            switch (resource){
+                case HILLS -> {
+
+                }
+                case FOREST -> {
+                }
+                case MOUNTAINS -> {
+                }
+                case FIELDS -> {
+                }
+                case PASTURE -> {
                 }
             }
         }

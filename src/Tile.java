@@ -1,9 +1,7 @@
 
 public class Tile {
-    public Tile(Resource resource) {
-        this.resource = resource;
-    }
-
+    private int n = -1;
+    private boolean raided = false;
     public enum Resource {
         HILLS,
         FOREST,
@@ -13,6 +11,11 @@ public class Tile {
         DESERT,
         WATER
     }
+    public Tile(Resource resource) {
+        this.resource = resource;
+    }
+
+
     private final Tile[] neighbours = new Tile[6]; // Beginning at the top (right) and going clockwise
     private final Junction[] junctions = new Junction[6]; // Beginning at the top (right) and going clockwise
     private final Resource resource;
@@ -35,5 +38,21 @@ public class Tile {
 
     public Resource getResource() {
         return resource;
+    }
+
+    public int getN() {
+        return n;
+    }
+
+    public void setN(int n) {
+        this.n = n;
+    }
+
+    public boolean isRaided() {
+        return raided;
+    }
+
+    public void setRaided(boolean raided) {
+        this.raided = raided;
     }
 }
