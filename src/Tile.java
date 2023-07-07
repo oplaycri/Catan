@@ -1,5 +1,9 @@
 
 public class Tile {
+    public Tile(Resource resource) {
+        this.resource = resource;
+    }
+
     public enum Resource {
         HILLS,
         FOREST,
@@ -8,8 +12,7 @@ public class Tile {
         PASTURE,
         DESERT
     }
-
-    private Intersection[] Intersections = new Intersection[6]; // Beginning at the top and going clockwise
+    private Intersection[] Intersections = new Intersection[6]; // Beginning at the top (right) and going clockwise
     private Resource resource;
 
     public Intersection[] getIntersections() {
