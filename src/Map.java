@@ -7,15 +7,15 @@ public class Map {
     int forests_left, fields_left, pastures_left = 4;
     int deserts_left = 1;
     boolean neigh_filled = false;
-    LinkedList<Tile> tiles;
+    LinkedList<Tile> tiles = new LinkedList<>();
 
     public void initMap() {
         Tile start = getNewTile();
         tiles.add(start);
         fillSurroundingTiles(start);
         Object[] Iteration = start.getNeighbours();
-        for (Object value : Iteration) {
-            fillSurroundingTiles((Tile) value);
+        for (Object o : Iteration) {
+            fillSurroundingTiles((Tile) o);
         }
         Iteration = tiles.toArray();
         for (Object o : Iteration) {
@@ -84,8 +84,8 @@ public class Map {
             neighbours[(6 + i + 1) % 6] = neighbours[i].getNeighbours()[(i + 2) % 6];
         }
         if (neigh_filled) {
-            for (int i = 0; i < neighbours.length; i++) {
-                if (neighbours[i] == null) {
+            for (Tile neighbour : neighbours) {
+                if (neighbour == null) {
                     neigh_filled = false;
                     break;
                 }

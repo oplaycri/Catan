@@ -13,9 +13,9 @@ public class Tile {
         DESERT,
         WATER
     }
-    private Tile[] neighbours = new Tile[6]; // Beginning at the top (right) and going clockwise
-    private Junction[] junctions = new Junction[6]; // Beginning at the top (right) and going clockwise
-    private Resource resource;
+    private final Tile[] neighbours = new Tile[6]; // Beginning at the top (right) and going clockwise
+    private final Junction[] junctions = new Junction[6]; // Beginning at the top (right) and going clockwise
+    private final Resource resource;
 
     public Junction[] getJunctions() {
         return junctions;

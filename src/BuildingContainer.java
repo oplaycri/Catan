@@ -6,4 +6,9 @@ public class BuildingContainer {
     }
     private Building building = null;
     private Player owner = null;
+
+    public void setBuilding(Building b, Player p){
+        building = b;
+        owner = p;
+    }
 }
