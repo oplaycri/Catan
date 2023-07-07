@@ -10,12 +10,30 @@ public class Tile {
         MOUNTAINS,
         FIELDS,
         PASTURE,
-        DESERT
+        DESERT,
+        WATER
     }
-    private Intersection[] Intersections = new Intersection[6]; // Beginning at the top (right) and going clockwise
+    private Tile[] neighbours = new Tile[6]; // Beginning at the top (right) and going clockwise
+    private Junction[] junctions = new Junction[6]; // Beginning at the top (right) and going clockwise
     private Resource resource;
 
-    public Intersection[] getIntersections() {
-        return Intersections;
+    public Junction[] getJunctions() {
+        return junctions;
+    }
+
+    public Tile[] getNeighbours() {
+        return neighbours;
+    }
+
+    public void setNeighbour(int i, Tile t){
+        neighbours[i] = t;
+    }
+
+    public Tile getNeighbour(int i){
+        return neighbours[i];
+    }
+
+    public Resource getResource() {
+        return resource;
     }
 }

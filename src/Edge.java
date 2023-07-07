@@ -1,4 +1,9 @@
 public class Edge extends BuildingContainer{
-    Intersection A;
-    Intersection B;
+    Junction A;
+    Junction B;
+
+    public Edge(Junction a, Junction b) {
+        A = a;
+        B = b;
+    }
 }
