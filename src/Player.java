@@ -1,4 +1,5 @@
 public class Player {
+    // Set methods will be in a changing/relative manner
     private int brick, lumber, ore, grain, wool = 0;
     private int settlements_left = 5;
     private int cities_left = 4;
@@ -9,7 +10,7 @@ public class Player {
     }
 
     public void setBrick(int brick) {
-        this.brick = brick;
+        this.brick += brick;
     }
 
     public int getLumber() {
@@ -17,7 +18,7 @@ public class Player {
     }
 
     public void setLumber(int lumber) {
-        this.lumber = lumber;
+        this.lumber += lumber;
     }
 
     public int getOre() {
@@ -25,7 +26,7 @@ public class Player {
     }
 
     public void setOre(int ore) {
-        this.ore = ore;
+        this.ore += ore;
     }
 
     public int getGrain() {
@@ -33,7 +34,7 @@ public class Player {
     }
 
     public void setGrain(int grain) {
-        this.grain = grain;
+        this.grain += grain;
     }
 
     public int getWool() {
@@ -41,7 +42,7 @@ public class Player {
     }
 
     public void setWool(int wool) {
-        this.wool = wool;
+        this.wool += wool;
     }
 
     public int getSettlements_left() {
