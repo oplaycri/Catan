@@ -18,7 +18,7 @@ public class Map {
      * Initializes the tiles of the map, their junctions, paths and numbers, as well as the robber.
      * Shall be called first.
      * */
-    public void initMap() {
+    public void init() {
         Tile start = getNewTile();
         tiles.add(start);
         // Inserting all the Tiles into a Graph-structure
@@ -208,6 +208,7 @@ public class Map {
             }
         }
     }
+    // TODO Give Control over Resources to Game
     public void placeBuilding(BuildingContainer.Building b, BuildingContainer container, Player owner){
         container.setBuilding(b, owner);
         switch (b){
