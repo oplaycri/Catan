@@ -6,4 +6,12 @@ public class Edge extends BuildingContainer{
         A = a;
         B = b;
     }
+
+    public Junction getA() {
+        return A;
+    }
+
+    public Junction getB() {
+        return B;
+    }
 }

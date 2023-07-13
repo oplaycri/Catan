@@ -210,6 +210,22 @@ public class Map {
     }
     public void placeBuilding(BuildingContainer.Building b, BuildingContainer container, Player owner){
         container.setBuilding(b, owner);
+        switch (b){
+            case City ->{
+                owner.setGrain(-2);
+                owner.setOre(-3);
+            }
+            case Settlement -> {
+                owner.setWool(-1);
+                owner.setGrain(-1);
+                owner.setLumber(-1);
+                owner.setBrick(-1);
+            }
+            case Road -> {
+                owner.setLumber(-1);
+                owner.setBrick(-1);
+            }
+        }
     }
     public boolean checkValidPlacement(BuildingContainer.Building b, BuildingContainer container, Player owner){
         switch (b){
@@ -227,14 +243,71 @@ public class Map {
     }
 
     private boolean checkValidRoad(BuildingContainer container, Player owner) {
-        return true;
+        if(owner.getBrick() < 1 || owner.getLumber()<1){
+            return false;
+        }
+        if(container instanceof Junction){
+            return false;
+        }
+        Edge edge = (Edge) container;
+        if(edge.getOwner() != null){
+            return false;
+        }
+        Edge[] temp = edge.getA().getEdges();
+        for (Edge e : temp) {
+            if (e == edge) {
+                continue;
+            }
+            if (e.getOwner() == owner) {
+                return true;
+            }
+        }
+        temp = edge.getB().getEdges();
+        for (Edge e : temp) {
+            if (e == edge) {
+                continue;
+            }
+            if (e.getOwner() == owner) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean checkValidSettlement(BuildingContainer container, Player owner) {
-        return true;
+        if(owner.getBrick() < 1 || owner.getGrain() < 1 || owner.getLumber()<1 || owner.getWool() < 1){
+            return false;
+        }
+        if(container instanceof Edge){
+            return false;
+        }
+        Junction junction = (Junction) container;
+        if (junction.getOwner() != null){
+            return false;
+        }
+        Edge[] temp = junction.getEdges();
+        for (Edge edge : temp) {
+            if (edge.getOwner() == owner) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private boolean checkValidCity(BuildingContainer container, Player owner) {
+        if(owner.getGrain() < 2 || owner.getOre()<3){
+            return false;
+        }
+        if(container instanceof Edge){
+            return false;
+        }
+        Junction junction = (Junction) container;
+        if (junction.getOwner() != owner){
+            return false;
+        }
+        if(junction.getBuilding() != BuildingContainer.Building.Settlement){
+            return false;
+        }
         return true;
     }
 }
