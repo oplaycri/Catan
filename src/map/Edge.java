@@ -1,6 +1,9 @@
-public class Edge extends BuildingContainer{
+package map;
+
+public class Edge extends BuildingContainer {
     Junction A;
     Junction B;
+    Harbor harbor = null;
 
     public Edge(Junction a, Junction b) {
         A = a;

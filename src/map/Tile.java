@@ -1,3 +1,4 @@
+package map;
 
 public class Tile {
     private int n = -1;

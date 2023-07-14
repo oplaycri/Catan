@@ -1,8 +1,13 @@
+package game;
+
+import map.BuildingContainer;
+import map.Map;
+
 import java.util.Random;
 
 public class Game {
     private Random random = new Random();
-    // Min. 1 Player guaranteed by Server
+    // Min. 1 game.Player guaranteed by connection.Server
     private enum State {
         INIT,
         INITIAL_PLACEMENT,

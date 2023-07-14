@@ -1,3 +1,5 @@
+package game;
+
 public class Player {
     // Set methods will be in a changing/relative manner
     private int brick, lumber, ore, grain, wool = 0;
@@ -55,13 +57,5 @@ public class Player {
 
     public int getRoads_left() {
         return roads_left;
-    }
-
-    public int getPlayNum() {
-        return playNum;
-    }
-
-    public void setPlayNum(int playNum) {
-        this.playNum = playNum;
     }
 }

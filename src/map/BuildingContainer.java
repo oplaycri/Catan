@@ -1,3 +1,6 @@
+package map;
+import game.Player;
+
 public class BuildingContainer {
     public enum Building{
         Settlement,

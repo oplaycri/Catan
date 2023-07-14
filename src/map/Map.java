@@ -1,3 +1,7 @@
+package map;
+
+import game.Player;
+
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Random;
@@ -208,7 +212,7 @@ public class Map {
             }
         }
     }
-    // TODO Give Control over Resources to Game
+    // TODO Give Control over Resources to game.Game
     public void placeBuilding(BuildingContainer.Building b, BuildingContainer container, Player owner){
         container.setBuilding(b, owner);
         switch (b){

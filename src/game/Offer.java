@@ -1,3 +1,7 @@
+package game;
+
+import map.Tile;
+
 public class Offer {
     Player from;
     Player to;
