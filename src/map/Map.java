@@ -9,6 +9,8 @@ import java.util.Random;
 public class Map {
 
     // Used for getting a new tile. Will be 0 at the end of initialization
+    private int specialHarbors_left = 5;
+    private int genericHarbors_left = 4;
     private int hills_left, mountains_left = 3;
     private int forests_left, fields_left, pastures_left = 4;
     private int deserts_left = 1;
@@ -43,8 +45,22 @@ public class Map {
         for (Tile tile : tiles) {
             fillEdges(tile);
         }
+        
         for (Tile tile : tiles) {
             fillNumbers(tile);
+        }
+        for (Tile tile : tiles) {
+            fillHarbors(tile);
+        }
+    }
+
+    private void fillHarbors(Tile t) {
+        Tile[] neighbours = t.getNeighbours();
+        for (int i = 0; i < neighbours.length; i++) {
+            if (neighbours[i].getResource() != Tile.Resource.WATER){
+                continue;
+            }
+
         }
     }
 
