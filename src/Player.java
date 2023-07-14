@@ -56,4 +56,12 @@ public class Player {
     public int getRoads_left() {
         return roads_left;
     }
+
+    public int getPlayNum() {
+        return playNum;
+    }
+
+    public void setPlayNum(int playNum) {
+        this.playNum = playNum;
+    }
 }
