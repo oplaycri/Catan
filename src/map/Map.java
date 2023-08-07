@@ -8,7 +8,7 @@ import java.util.Random;
 
 public class Map {
 
-    // Used for getting a new tile. Will be 0 at the end of initialization
+    // Used for getting a new Tile/Harbor. Will be 0 at the end of initialization
     private int specialHarbors_left = 5;
     private int genericHarbors_left = 4;
     private int hills_left, mountains_left = 3;
@@ -55,12 +55,34 @@ public class Map {
     }
 
     private void fillHarbors(Tile t) {
+        LinkedList<Edge> coastalEdges = new LinkedList<>();
         Tile[] neighbours = t.getNeighbours();
         for (int i = 0; i < neighbours.length; i++) {
-            if (neighbours[i].getResource() != Tile.Resource.WATER){
+            if (neighbours[i].getResource() == Tile.Resource.WATER){
+                coastalEdges.add(t.getEdges()[i]);
+            }
+        }
+        Random random = new Random();
+        while (specialHarbors_left != 0 && genericHarbors_left != 0 && coastalEdges.size() != 0){
+            int i = random.nextInt(coastalEdges.size());
+            Edge e = coastalEdges.get(i);
+            if(e.getA().getHarbor() != null || e.getB().getHarbor() != null){
+                coastalEdges.remove(i);
                 continue;
             }
-
+            int rng = random.nextInt(specialHarbors_left + genericHarbors_left) + 1;
+            Harbor harbor;
+            if (rng <= specialHarbors_left){
+                harbor = new SpecialHarbor();
+                specialHarbors_left--;
+            } else {
+                harbor = new GenericHarbor();
+                genericHarbors_left--;
+            }
+            e.setHarbor(harbor);
+            e.getA().setHarbor(harbor);
+            e.getB().setHarbor(harbor);
+            coastalEdges.remove(i);
         }
     }
 
@@ -84,7 +106,7 @@ public class Map {
             }
             // Determine where t would be indexed at neighbours[i].neighbours and filling the entry with t
             int relPos = (i + 3) % 6;
-            neighbours[i].setNeighbour(relPos, t);
+            neighbours[i].getNeighbours()[relPos] = t;
         }
         // Set the neighbours' neighbours of t
         fillNeighbours(t);
@@ -151,7 +173,7 @@ public class Map {
         }
     }
     /**
-     * Fills the edges between t's junctions.
+     * Fills the edges in t and between t's junctions.
      * */
     private void fillEdges(Tile t) {
         Junction[] junctions = t.getJunctions();
@@ -159,6 +181,7 @@ public class Map {
         int relEdgePos = 2;
         for (int i = 0; i < junctions.length; i++) {
             Edge e = new Edge(junctions[i], junctions[(i+1)%6]);
+            t.getEdges()[i] = e;
             junctions[i].getEdges()[edgePos] = e;
             junctions[(i+1)%6].getEdges()[relEdgePos] = e;
             // Needs to be visualized
@@ -248,23 +271,23 @@ public class Map {
             }
         }
     }
-    public boolean checkValidPlacement(BuildingContainer.Building b, BuildingContainer container, Player owner){
+    public boolean checkValidPlacement(BuildingContainer.Building b, BuildingContainer container, Player owner, boolean isInit){
         switch (b){
             case City -> {
-                return checkValidCity(container, owner);
+                return checkValidCity(container, owner, isInit);
             }
             case Settlement -> {
-                return checkValidSettlement(container, owner);
+                return checkValidSettlement(container, owner, isInit);
             }
             case Road -> {
-                return checkValidRoad(container, owner);
+                return checkValidRoad(container, owner, isInit);
             }
         }
         return true;
     }
 
-    private boolean checkValidRoad(BuildingContainer container, Player owner) {
-        if(owner.getBrick() < 1 || owner.getLumber()<1){
+    private boolean checkValidRoad(BuildingContainer container, Player owner, boolean isInit) {
+        if(!isInit && (owner.getBrick() < 1 || owner.getLumber()<1)){
             return false;
         }
         if(container instanceof Junction){
@@ -295,8 +318,8 @@ public class Map {
         return false;
     }
 
-    private boolean checkValidSettlement(BuildingContainer container, Player owner) {
-        if(owner.getBrick() < 1 || owner.getGrain() < 1 || owner.getLumber()<1 || owner.getWool() < 1){
+    private boolean checkValidSettlement(BuildingContainer container, Player owner, boolean isInit) {
+        if(!isInit && (owner.getBrick() < 1 || owner.getGrain() < 1 || owner.getLumber()<1 || owner.getWool() < 1)){
             return false;
         }
         if(container instanceof Edge){
@@ -312,10 +335,15 @@ public class Map {
                 return true;
             }
         }
+        for (Edge edge : temp) {
+            if (edge.getOwner() == owner) {
+                return true;
+            }
+        }
         return false;
     }
 
-    private boolean checkValidCity(BuildingContainer container, Player owner) {
+    private boolean checkValidCity(BuildingContainer container, Player owner, boolean isInit) {
         if(owner.getGrain() < 2 || owner.getOre()<3){
             return false;
         }

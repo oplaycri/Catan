@@ -24,7 +24,9 @@ public class Game {
         this.map = map;
         state = State.INIT;
     }
-
+    /**
+     * Initializes the Game and Map
+     * */
     public boolean init(){
         if(state != State.INIT){
             return false;

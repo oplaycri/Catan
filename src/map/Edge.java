@@ -17,4 +17,12 @@ public class Edge extends BuildingContainer {
     public Junction getB() {
         return B;
     }
+
+    public Harbor getHarbor() {
+        return harbor;
+    }
+
+    public void setHarbor(Harbor harbor) {
+        this.harbor = harbor;
+    }
 }

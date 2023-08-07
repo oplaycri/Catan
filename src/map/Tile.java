@@ -1,25 +1,21 @@
 package map;
 
+/**
+ * Base component of the datastructure to construct a hexagonal Catan grid.
+ * A Tile stores Information about its Resource, number, and whether it has been raided or not.
+ * Additionally, a Tile knows all of its neighbouring Tiles, Junctions and Edges.
+ * Tiles are managed by Map.
+ */
 public class Tile {
+    private final Tile[] neighbours = new Tile[6]; // Beginning at the top (right) and going clockwise
+    private final Junction[] junctions = new Junction[6]; // Beginning at the top (right) and going clockwise
+    private final Edge[] edges = new Edge[6]; // Beginning at the top (right) and going clockwise
+    private final Resource resource;
     private int n = -1;
     private boolean raided = false;
-    public enum Resource {
-        HILLS,
-        FOREST,
-        MOUNTAINS,
-        FIELDS,
-        PASTURE,
-        DESERT,
-        WATER
-    }
     public Tile(Resource resource) {
         this.resource = resource;
     }
-
-
-    private final Tile[] neighbours = new Tile[6]; // Beginning at the top (right) and going clockwise
-    private final Junction[] junctions = new Junction[6]; // Beginning at the top (right) and going clockwise
-    private final Resource resource;
 
     public Junction[] getJunctions() {
         return junctions;
@@ -29,12 +25,8 @@ public class Tile {
         return neighbours;
     }
 
-    public void setNeighbour(int i, Tile t){
-        neighbours[i] = t;
-    }
-
-    public Tile getNeighbour(int i){
-        return neighbours[i];
+    public Edge[] getEdges() {
+        return edges;
     }
 
     public Resource getResource() {
@@ -55,5 +47,15 @@ public class Tile {
 
     public void setRaided(boolean raided) {
         this.raided = raided;
+    }
+
+    public enum Resource {
+        HILLS,
+        FOREST,
+        MOUNTAINS,
+        FIELDS,
+        PASTURE,
+        DESERT,
+        WATER
     }
 }
