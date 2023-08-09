@@ -10,7 +10,9 @@ public class Game {
     // Min. 1 game.Player guaranteed by connection.Server
     private enum State {
         INIT,
-        INITIAL_PLACEMENT,
+        INITIAL_PLACEMENT_SETTLEMENT,
+        INITIAL_PLACEMENT_ROAD,
+        INITIAL_RESOURCES,
         WON
     }
     private State state;
@@ -33,18 +35,43 @@ public class Game {
         }
         map = new Map();
         map.init();
-        state = State.INITIAL_PLACEMENT;
+        state = State.INITIAL_PLACEMENT_SETTLEMENT;
         return true;
     }
 
     public boolean initialPlacement(Player player, BuildingContainer.Building b, BuildingContainer container){
-        if(state != State.INITIAL_PLACEMENT){
+        if(state != State.INITIAL_PLACEMENT_SETTLEMENT || state != State.INITIAL_PLACEMENT_ROAD){
             return false;
         }
         if(players[curPlayer] != player){
             return false;
         }
-        if()
+        if (state == State.INITIAL_PLACEMENT_SETTLEMENT && !(b == BuildingContainer.Building.Settlement) ||
+            state == State.INITIAL_PLACEMENT_ROAD && !(b == BuildingContainer.Building.Road)){
+            return false;
+        }
+        if(map.checkValidPlacement(b, container, player, true)){
+            map.placeBuilding(b, container, player);
+            // Resources will not be updated during the initial phase
+            if(state == State.INITIAL_PLACEMENT_SETTLEMENT){
+                state = State.INITIAL_PLACEMENT_ROAD;
+                return true;
+            }
+            for (Player p: players){
+                if(p.getSettlements() != 2 || p.getRoads() != 2){
+                    state = State.INITIAL_PLACEMENT_SETTLEMENT;
+                    nextPlayer();
+                    return true;
+                }
+            }
+            state = State.INITIAL_RESOURCES;
+            nextPlayer();
+            return true;
+        }
+        return false;
+    }
+    private void nextPlayer(){
+        curPlayer = (curPlayer+1) % players.length
     }
     public boolean endTurn(Player player){
         return true;

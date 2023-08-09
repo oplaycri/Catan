@@ -19,6 +19,7 @@ public class Map {
     // Stores all the tiles, beginning at the center, then the first layer, then the second.
     // Does not include water tiles
     LinkedList<Tile> tiles = new LinkedList<>();
+    private Random random = new Random();
 
     /**
      * Initializes the tiles of the map, their junctions, paths and numbers, as well as the robber.
@@ -62,7 +63,6 @@ public class Map {
                 coastalEdges.add(t.getEdges()[i]);
             }
         }
-        Random random = new Random();
         while (specialHarbors_left != 0 && genericHarbors_left != 0 && coastalEdges.size() != 0){
             int i = random.nextInt(coastalEdges.size());
             Edge e = coastalEdges.get(i);
@@ -174,16 +174,28 @@ public class Map {
     }
     /**
      * Fills the edges in t and between t's junctions.
+     * Also fills neighbours of each Junction.
      * */
     private void fillEdges(Tile t) {
         Junction[] junctions = t.getJunctions();
         int edgePos = 1;
         int relEdgePos = 2;
         for (int i = 0; i < junctions.length; i++) {
-            Edge e = new Edge(junctions[i], junctions[(i+1)%6]);
+            if (t.getEdges()[i]!=null){
+                continue;
+            }
+            Junction a = junctions[i];
+            Junction b = junctions[(i+1)%6];
+            Edge e = new Edge(a, b);
+            // Fill Edge in Tiles
             t.getEdges()[i] = e;
-            junctions[i].getEdges()[edgePos] = e;
-            junctions[(i+1)%6].getEdges()[relEdgePos] = e;
+            t.getEdges()[(i+3)%6] = e;
+            // Fill Edge in Junctions
+            a.getEdges()[edgePos] = e;
+            b.getEdges()[relEdgePos] = e;
+            // Fill Neighbour in Junctions
+            a.getNeighbours()[edgePos] = b;
+            b.getNeighbours()[relEdgePos] = a;
             // Needs to be visualized
             if(i%2!=0) {
                 edgePos = (edgePos + 1) % 3;
@@ -253,23 +265,7 @@ public class Map {
     }
     // TODO Give Control over Resources to game.Game
     public void placeBuilding(BuildingContainer.Building b, BuildingContainer container, Player owner){
-        container.setBuilding(b, owner);
-        switch (b){
-            case City ->{
-                owner.setGrain(-2);
-                owner.setOre(-3);
-            }
-            case Settlement -> {
-                owner.setWool(-1);
-                owner.setGrain(-1);
-                owner.setLumber(-1);
-                owner.setBrick(-1);
-            }
-            case Road -> {
-                owner.setLumber(-1);
-                owner.setBrick(-1);
-            }
-        }
+        container.placeBuilding(b, owner);
     }
     public boolean checkValidPlacement(BuildingContainer.Building b, BuildingContainer container, Player owner, boolean isInit){
         switch (b){
@@ -344,19 +340,7 @@ public class Map {
     }
 
     private boolean checkValidCity(BuildingContainer container, Player owner, boolean isInit) {
-        if(owner.getGrain() < 2 || owner.getOre()<3){
-            return false;
-        }
-        if(container instanceof Edge){
-            return false;
-        }
-        Junction junction = (Junction) container;
-        if (junction.getOwner() != owner){
-            return false;
-        }
-        if(junction.getBuilding() != BuildingContainer.Building.Settlement){
-            return false;
-        }
+
         return true;
     }
 }

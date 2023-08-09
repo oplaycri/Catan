@@ -1,0 +1,28 @@
+Working:
+- Map Generation with Tiles, Edges, Junctions, Harbors Numbers and Robber
+
+
+Work in Progress:
+- Placement of Buildings / Updating everything correctly (Implement placement in map.BuildingContainer.placeBuilding())
+(Future) Issues:
+- Map Generation for non standard boards
+- coastal Edges are badly specified (see map.Map.fillHarbors())
+-
+
+Temp storage:
+switch (b){
+            case City ->{
+                owner.setGrain(-2);
+                owner.setOre(-3);
+            }
+            case Settlement -> {
+                owner.setWool(-1);
+                owner.setGrain(-1);
+                owner.setLumber(-1);
+                owner.setBrick(-1);
+            }
+            case Road -> {
+                owner.setLumber(-1);
+                owner.setBrick(-1);
+            }
+        }

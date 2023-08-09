@@ -10,10 +10,7 @@ public class BuildingContainer {
     private Building building = null;
     private Player owner = null;
 
-    public void setBuilding(Building b, Player p){
-        building = b;
-        owner = p;
-    }
+    public void placeBuilding(Building b, Player p){}
 
     public Building getBuilding() {
         return building;
