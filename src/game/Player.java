@@ -1,5 +1,9 @@
 package game;
 
+import map.Tile;
+
+import java.util.Random;
+
 public class Player {
     // Set methods will be in a changing/relative manner
     private int brick, lumber, ore, grain, wool = 0;
@@ -57,5 +61,25 @@ public class Player {
 
     public int getRoads_left() {
         return roads_left;
+    }
+    public int getTotalResources(){
+        return brick + lumber + ore + grain + wool;
+    }
+    public Tile.Resource getRandomResource(){
+        int totalResources = getTotalResources();
+        int rng = new Random().nextInt(totalResources)+1;
+        if(rng>(totalResources-=wool)){
+            return Tile.Resource.PASTURE;
+        }
+        if(rng>(totalResources-=grain)){
+            return Tile.Resource.FIELDS;
+        }
+        if(rng>(totalResources-=ore)){
+            return Tile.Resource.MOUNTAINS;
+        }
+        if(rng>(totalResources-=lumber)){
+            return Tile.Resource.FOREST;
+        }
+        return Tile.Resource.HILLS;
     }
 }

@@ -24,5 +24,8 @@ public class Edge extends BuildingContainer {
 
     public void setHarbor(Harbor harbor) {
         this.harbor = harbor;
+
+        A.setHarbor(harbor);
+        B.setHarbor(harbor);
     }
 }
