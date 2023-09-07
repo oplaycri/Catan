@@ -50,19 +50,20 @@ public class Map {
         for (Tile tile : tiles) {
             fillNumbers(tile);
         }
-        for (Tile tile : tiles) {
-            fillHarbors(tile);
-        }
+        fillHarbors();
     }
 
-    private void fillHarbors(Tile t) {
+    private void fillHarbors() {
         LinkedList<Edge> coastalEdges = new LinkedList<>();
-        Tile[] neighbours = t.getNeighbours();
-        for (int i = 0; i < neighbours.length; i++) {
-            if (neighbours[i].getResource() == Tile.Resource.WATER){
-                coastalEdges.add(t.getEdges()[i]);
+        for(Tile t:tiles) {
+            Tile[] neighbours = t.getNeighbours();
+            for (int i = 0; i < neighbours.length; i++) {
+                if (neighbours[i].getResource() == Tile.Resource.WATER) {
+                    coastalEdges.add(t.getEdges()[i]);
+                }
             }
         }
+        Random random = new Random();
         while (specialHarbors_left != 0 && genericHarbors_left != 0 && coastalEdges.size() != 0){
             int i = random.nextInt(coastalEdges.size());
             Edge e = coastalEdges.get(i);
@@ -80,8 +81,6 @@ public class Map {
                 genericHarbors_left--;
             }
             e.setHarbor(harbor);
-            e.getA().setHarbor(harbor);
-            e.getB().setHarbor(harbor);
             coastalEdges.remove(i);
         }
     }
@@ -102,7 +101,7 @@ public class Map {
                 tiles.add(neighbours[i]);
             }
             if (neighbours[i].getResource() == Tile.Resource.DESERT){
-                neighbours[i].setRaided(true);
+                neighbours[i].setHasRobber(true);
             }
             // Determine where t would be indexed at neighbours[i].neighbours and filling the entry with t
             int relPos = (i + 3) % 6;
@@ -227,7 +226,7 @@ public class Map {
      * (brick, lumber, ore, grain or wool) (+1 or +2).
      * */
     private void updateResourceTile(Tile t, int diceRoll){
-        if (t.isRaided()||t.getN()==-1||t.getN()!=diceRoll){
+        if (t.HasRobber()||t.getN()==-1||t.getN()!=diceRoll){
             return;
         }
         Junction[] junctions = t.getJunctions();
@@ -270,22 +269,20 @@ public class Map {
     public boolean checkValidPlacement(BuildingContainer.Building b, BuildingContainer container, Player owner, boolean isInit){
         switch (b){
             case City -> {
-                return checkValidCity(container, owner, isInit);
+                return checkValidCity(container, owner);
             }
             case Settlement -> {
                 return checkValidSettlement(container, owner, isInit);
             }
             case Road -> {
-                return checkValidRoad(container, owner, isInit);
+                return checkValidRoad(container, owner);
             }
         }
-        return true;
+        return false;
     }
 
-    private boolean checkValidRoad(BuildingContainer container, Player owner, boolean isInit) {
-        if(!isInit && (owner.getBrick() < 1 || owner.getLumber()<1)){
-            return false;
-        }
+    private boolean checkValidRoad(BuildingContainer container, Player owner) {
+        // Basic check
         if(container instanceof Junction){
             return false;
         }
@@ -293,17 +290,27 @@ public class Map {
         if(edge.getOwner() != null){
             return false;
         }
-        Edge[] temp = edge.getA().getEdges();
+
+        Junction A = edge.getA();
+        Junction B = edge.getB();
+        // Check or adjacent road
+        Edge[] temp = A.getEdges();
         for (Edge e : temp) {
+            if(A.getOwner() != null){
+                break;
+            }
             if (e == edge) {
                 continue;
             }
-            if (e.getOwner() == owner) {
+            if (e.getOwner() == owner && ) {
                 return true;
             }
         }
         temp = edge.getB().getEdges();
         for (Edge e : temp) {
+            if(B.getOwner() != null){
+                break;
+            }
             if (e == edge) {
                 continue;
             }
@@ -311,13 +318,15 @@ public class Map {
                 return true;
             }
         }
+        // Check for adjacent Settlement or City
+        if(A.getOwner() == owner || B.getOwner() == owner){
+            return true;
+        }
         return false;
     }
 
     private boolean checkValidSettlement(BuildingContainer container, Player owner, boolean isInit) {
-        if(!isInit && (owner.getBrick() < 1 || owner.getGrain() < 1 || owner.getLumber()<1 || owner.getWool() < 1)){
-            return false;
-        }
+        // Basic check
         if(container instanceof Edge){
             return false;
         }
@@ -325,22 +334,65 @@ public class Map {
         if (junction.getOwner() != null){
             return false;
         }
+
         Edge[] temp = junction.getEdges();
+        // Check for adjacent Settlement
+        for(Edge edge : temp){
+            Junction A = edge.getA();
+            Junction B = edge.getB();
+            if(A!=junction&&A.getOwner()!=null){
+                return false;
+            }
+            if(B!=junction&&B.getOwner()!=null){
+                return false;
+            }
+        }
+
+        if(isInit){
+            return true;
+        }
+
+        // Check for adjacent roads of owner
         for (Edge edge : temp) {
             if (edge.getOwner() == owner) {
                 return true;
             }
         }
-        for (Edge edge : temp) {
-            if (edge.getOwner() == owner) {
-                return true;
-            }
-        }
+
         return false;
     }
 
-    private boolean checkValidCity(BuildingContainer container, Player owner, boolean isInit) {
+    private boolean checkValidCity(BuildingContainer container, Player owner) {
+        // Basic check
+        if(container instanceof Edge){
+            return false;
+        }
+        Junction junction = (Junction) container;
+        if (junction.getOwner() != owner){
+            return false;
+        }
 
+        if(junction.getBuilding() != BuildingContainer.Building.Settlement){
+            return false;
+        }
         return true;
+    }
+
+    public Tile findRobber(){
+        for (Tile tile: tiles){
+            if (tile.HasRobber()){
+                return tile;
+            }
+        }
+        return null;
+    }
+
+    public boolean canSteal(Player target) {
+        Tile robbberTile = findRobber();
+        for (Junction junction: robbberTile.getJunctions()){
+            if(junction.getBuilding()!= null && junction.getOwner() == target){
+                return true;
+            }
+        }
     }
 }

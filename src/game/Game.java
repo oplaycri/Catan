@@ -2,105 +2,190 @@ package game;
 
 import map.BuildingContainer;
 import map.Map;
+import map.Tile;
 
 import java.util.Random;
 
 public class Game {
     private Random random = new Random();
-    // Min. 1 game.Player guaranteed by connection.Server
-    private enum State {
-        INIT,
-        INITIAL_PLACEMENT_SETTLEMENT,
-        INITIAL_PLACEMENT_ROAD,
-        INITIAL_RESOURCES,
-        WON
-    }
     private State state;
-    Player[] players;
-    int curPlayer;
-    Map map;
+    private Player[] players;
+    private int curPlayer;
+    private int initCounter = 0;
+    private Map map;
 
-    public Game(int playNum, Map map) {
+    public Game(int playNum) {
         players = new Player[playNum];
         curPlayer = random.nextInt(playNum);
-        this.map = map;
         state = State.INIT;
     }
+
     /**
      * Initializes the Game and Map
-     * */
-    public boolean init(){
-        if(state != State.INIT){
+     */
+    public boolean init() {
+        if (state != State.INIT) {
             return false;
         }
         map = new Map();
         map.init();
-        state = State.INITIAL_PLACEMENT_SETTLEMENT;
+        state = State.INITIAL_PLACEMENT_1;
         return true;
     }
 
-    public boolean initialPlacement(Player player, BuildingContainer.Building b, BuildingContainer container){
-        if(state != State.INITIAL_PLACEMENT_SETTLEMENT || state != State.INITIAL_PLACEMENT_ROAD){
+    /**
+     * Round 1 of initial placement
+     */
+    private boolean initialPlacement1(Player player, BuildingContainer.Building b, BuildingContainer container) {
+        if (players[curPlayer] != player) {
             return false;
         }
-        if(players[curPlayer] != player){
-            return false;
-        }
-        if (state == State.INITIAL_PLACEMENT_SETTLEMENT && !(b == BuildingContainer.Building.Settlement) ||
-            state == State.INITIAL_PLACEMENT_ROAD && !(b == BuildingContainer.Building.Road)){
-            return false;
-        }
-        if(map.checkValidPlacement(b, container, player, true)){
-            map.placeBuilding(b, container, player);
-            // Resources will not be updated during the initial phase
-            if(state == State.INITIAL_PLACEMENT_SETTLEMENT){
-                state = State.INITIAL_PLACEMENT_ROAD;
-                return true;
-            }
-            for (Player p: players){
-                if(p.getSettlements() != 2 || p.getRoads() != 2){
-                    state = State.INITIAL_PLACEMENT_SETTLEMENT;
-                    nextPlayer();
-                    return true;
+        switch (b) {
+            case Settlement -> {
+                if (player.getSettlements_left() != 5) {
+                    return false;
                 }
             }
-            state = State.INITIAL_RESOURCES;
-            nextPlayer();
+            case Road -> {
+                if (player.getRoads_left() != 15 || player.getSettlements_left() != 4) {
+                    return false;
+                }
+
+            }
+        }
+        if (!map.checkValidPlacement(b, container, player, true)) {
+            return false;
+        }
+        initCounter++;
+        if (initCounter == players.length) {
+            initCounter = 0;
+            state = State.INITIAL_PLACEMENT_2;
             return true;
         }
-        return false;
+        curPlayer = (curPlayer + 1) % players.length;
+        return true;
+
     }
-    private void nextPlayer(){
-        curPlayer = (curPlayer+1) % players.length
-    }
-    public boolean endTurn(Player player){
+
+    /**
+     * Round 2 of initial placement
+     */
+    private boolean initialPlacement2(Player player, BuildingContainer.Building b, BuildingContainer container) {
+        if (players[curPlayer] != player) {
+            return false;
+        }
+        switch (b) {
+            case Settlement -> {
+                if (player.getSettlements_left() != 5) {
+                    return false;
+                }
+            }
+            case Road -> {
+                if (player.getRoads_left() != 15 || player.getSettlements_left() != 4) {
+                    return false;
+                }
+
+            }
+        }
+        if (!map.checkValidPlacement(b, container, player, true)) {
+            return false;
+        }
+        initCounter++;
+        if (initCounter == players.length) {
+            state = State.DICE_ROLL;
+            return true;
+        }
+        curPlayer = (curPlayer - 1 + players.length) % players.length;
         return true;
     }
-    public boolean makeOffer(Player player, Offer offer){
+
+    public boolean rollDice() {
+        if (state != State.DICE_ROLL) {
+            return false;
+        }
+        int res1 = random.nextInt(6) + 1;
+        int res2 = random.nextInt(6) + 1;
+        int res = res1 + res2;
+        map.updateResources(res);
+        if (res == 7) {
+            state = State.MOVE_ROBBER;
+            return true;
+        }
+        state = State.TURN;
         return true;
     }
-    public boolean engageOffer(Player player, Offer offer, boolean accept){
+
+    public boolean endTurn(Player player) {
         return true;
     }
-    public boolean place(Player player, BuildingContainer.Building b, BuildingContainer buildingContainer){
+
+    public boolean makeOffer(Player player, Offer offer) {
         return true;
     }
-    public boolean tradeOverseas(Player player, Tile.Resource sold, Tile.Resource bought){
+
+    public boolean engageOffer(Player player, Offer offer, boolean accept) {
         return true;
     }
-    public boolean placeRobber(Player player, Tile tile){
+
+    public boolean place(Player player, BuildingContainer.Building b, BuildingContainer container) {
+        if (state == State.INITIAL_PLACEMENT_1) {
+            return initialPlacement1(player, b, container);
+        }
+        if (state == State.INITIAL_PLACEMENT_2) {
+            return initialPlacement2(player, b, container);
+        }
         return true;
     }
-    public boolean buyCard(Player player){
+
+    public boolean tradeOverseas(Player player, Tile.Resource sold, Tile.Resource bought) {
         return true;
     }
-    public boolean useCard(Player player){
+
+    public boolean moveRobber(Player player, Tile tile) {
+        if (state != State.MOVE_ROBBER || players[curPlayer] != player) {
+            return false;
+        }
+        if (tile == map.findRobber()) {
+            return false;
+        }
+        for (Player p : players) {
+            if (p != player && map.canSteal(p)) {
+                state = State.STEAL;
+                return true;
+            }
+        }
+        state = State.TURN;
         return true;
     }
-    public boolean steal(Player player, Player target){
+
+    public boolean buyCard(Player player) {
         return true;
     }
-    private boolean checkWin(Player player){
+
+    public boolean useCard(Player player) {
         return true;
+    }
+
+    public boolean steal(Player player, Player target) {
+        if (player==target || !map.canSteal(target)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private boolean checkWin(Player player) {
+        return true;
+    }
+
+    // Min. 1 game.Player guaranteed by connection.Server
+    private enum State {
+        INIT,
+        INITIAL_PLACEMENT_1,
+        INITIAL_PLACEMENT_2,
+        DICE_ROLL,
+        MOVE_ROBBER,
+        STEAL,
+        TURN, WON
     }
 }

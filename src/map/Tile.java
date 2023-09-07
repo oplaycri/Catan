@@ -12,7 +12,7 @@ public class Tile {
     private final Edge[] edges = new Edge[6]; // Beginning at the top (right) and going clockwise
     private final Resource resource;
     private int n = -1;
-    private boolean raided = false;
+    private boolean hasRobber = false;
     public Tile(Resource resource) {
         this.resource = resource;
     }
@@ -41,12 +41,12 @@ public class Tile {
         this.n = n;
     }
 
-    public boolean isRaided() {
-        return raided;
+    public boolean HasRobber() {
+        return hasRobber;
     }
 
-    public void setRaided(boolean raided) {
-        this.raided = raided;
+    public void setHasRobber(boolean hasRobber) {
+        this.hasRobber = hasRobber;
     }
 
     public enum Resource {
