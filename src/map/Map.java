@@ -58,7 +58,7 @@ public class Map {
         for(Tile t:tiles) {
             Tile[] neighbours = t.getNeighbours();
             for (int i = 0; i < neighbours.length; i++) {
-                if (neighbours[i].getTerrain() == Tile.Terrain.WATER) {
+                if (neighbours[i].terrain == Tile.Terrain.WATER) {
                     coastalEdges.add(t.getEdges()[i]);
                 }
             }
@@ -97,10 +97,10 @@ public class Map {
                 continue;
             }
             neighbours[i] = getNewTile();
-            if (neighbours[i].getTerrain() != Tile.Terrain.WATER){
+            if (neighbours[i].terrain!= Tile.Terrain.WATER){
                 tiles.add(neighbours[i]);
             }
-            if (neighbours[i].getTerrain() == Tile.Terrain.DESERT){
+            if (neighbours[i].terrain == Tile.Terrain.DESERT){
                 neighbours[i].setHasRobber(true);
             }
             // Determine where t would be indexed at neighbours[i].neighbours and filling the entry with t
@@ -204,7 +204,7 @@ public class Map {
         }
     }
     private void fillNumbers(Tile t){
-        if(t.getTerrain() == Tile.Terrain.DESERT || t.getTerrain() == Tile.Terrain.WATER){
+        if(t.terrain == Tile.Terrain.DESERT || t.terrain == Tile.Terrain.WATER){
             return;
         }
         Random random = new Random();
@@ -241,7 +241,7 @@ public class Map {
                 case Settlement -> amount = 1;
                 case City -> amount = 2;
             }
-            Tile.Terrain resource = t.getTerrain();
+            Tile.Terrain resource = t.terrain;
             owner.setResource(resource, owner.getResource(resource) + amount);
         }
     }
@@ -276,22 +276,14 @@ public class Map {
 
         Junction A = edge.getA();
         Junction B = edge.getB();
+        // Check for adjacent Settlement or City
+        if(A.getOwner() == owner || B.getOwner() == owner){
+            return true;
+        }
         // Check or adjacent road
         Edge[] temp = A.getEdges();
         for (Edge e : temp) {
-            if(A.getOwner() != null){
-                break;
-            }
-            if (e == edge) {
-                continue;
-            }
-            if (e.getOwner() == owner && ) {
-                return true;
-            }
-        }
-        temp = edge.getB().getEdges();
-        for (Edge e : temp) {
-            if(B.getOwner() != null){
+            if(A.getOwner() != owner){
                 break;
             }
             if (e == edge) {
@@ -301,9 +293,17 @@ public class Map {
                 return true;
             }
         }
-        // Check for adjacent Settlement or City
-        if(A.getOwner() == owner || B.getOwner() == owner){
-            return true;
+        temp = edge.getB().getEdges();
+        for (Edge e : temp) {
+            if(B.getOwner() != owner){
+                break;
+            }
+            if (e == edge) {
+                continue;
+            }
+            if (e.getOwner() == owner) {
+                return true;
+            }
         }
         return false;
     }

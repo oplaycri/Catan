@@ -74,14 +74,15 @@ public class Game {
         if (players[curPlayer] != player) {
             return false;
         }
-        switch (b) {
-            case Settlement -> {
+        Structure s = player.getStructure(b);
+        switch (s.name) {
+            case C -> {
                 if (player.getSettlements_left() != 5) {
                     return false;
                 }
             }
             case Road -> {
-                if (player.getRoads_left() != 15 || player.getSettlements_left() != 4) {
+                if (player.getRoads != 15 || player.getSettlements_left() != 4) {
                     return false;
                 }
 
@@ -148,7 +149,7 @@ public class Game {
         if (tile == map.findRobber()) {
             return false;
         }
-        map.moveRobber(Tile tile);
+        map.moveRobber(tile);
         for (Player p : players) {
             if (p != player && map.canSteal(p)) {
                 state = State.STEAL;
@@ -171,6 +172,12 @@ public class Game {
         if (state!=State.STEAL || player != players[curPlayer] || player==target || !map.canSteal(target)) {
             return false;
         }
+        // Decrement
+        Resource res = target.getRandomResource();
+        res.setAmount(res.getAmount()-1);
+        // Increment
+        res = player.getResource(res.name);
+        res.setAmount(res.getAmount() + 1);
 
         return true;
     }
