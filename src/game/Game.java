@@ -42,12 +42,12 @@ public class Game {
         }
         switch (b) {
             case Settlement -> {
-                if (player.getSettlements_left() != 5) {
+                if (player.getStructure(b).getLeft() != 5) {
                     return false;
                 }
             }
             case Road -> {
-                if (player.getRoads_left() != 15 || player.getSettlements_left() != 4) {
+                if (player.getStructure(b).getLeft() != 15 || player.getStructure(b).getLeft() != 4) {
                     return false;
                 }
 
@@ -74,15 +74,14 @@ public class Game {
         if (players[curPlayer] != player) {
             return false;
         }
-        Structure s = player.getStructure(b);
-        switch (s.name) {
-            case C -> {
-                if (player.getSettlements_left() != 5) {
+        switch (b) {
+            case Settlement -> {
+                if (player.getStructure(b).getLeft() != 5) {
                     return false;
                 }
             }
             case Road -> {
-                if (player.getRoads != 15 || player.getSettlements_left() != 4) {
+                if (player.getStructure(b).getLeft() != 15 || player.getStructure(b).getLeft() != 4) {
                     return false;
                 }
 
