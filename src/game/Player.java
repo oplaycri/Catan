@@ -10,124 +10,94 @@ import java.util.Random;
 
 public class Player {
     // Set methods will be in a changing/relative manner
-    private int brick, lumber, ore, grain, wool = 0;
-    private int settlements_left = 5;
-    private int cities_left = 4;
-    private int roads_left = 15;
-    private int settlements, cities, roads = 0;
-    LinkedList<BuildingContainer> buildings = new LinkedList<BuildingContainer>();
+    LinkedList<Resource> resources = new LinkedList<>();
+    private Resource brick = new Resource("brick", 0), lumber = new Resource("lumber", 0),
+            ore = new Resource("ore", 0), grain = new Resource("grain", 0),
+            wool = new Resource("wool", 0);
+    private Structure cities = new Structure("City", 4), settlements = new Structure("Settlement", 5),
+            roads = new Structure("roads", 15);
+    LinkedList<BuildingContainer> buildings = new LinkedList<>();
+
+    public Player() {
+        resources.add(brick);
+        resources.add(lumber);
+        resources.add(ore);
+        resources.add(grain);
+        resources.add(wool);
+    }
+
     public void addBuildingContainerAndUpdate(BuildingContainer b){
         buildings.add(b);
-        switch (b.getBuilding()){
-            case Settlement -> {
-                settlements_left--;
-                settlements++;
+        Structure s = mapBuilding(b.getBuilding());
+        s.setAmount(s.getAmount() + 1);
+        s.setLeft(s.getLeft() - 1);
+    }
+    /**
+     * Map Tile.Resource to the corresponding int variables. DESERT and WATER not specified
+     * */
+    private Resource mapTerrains(Tile.Terrain terrain){
+        switch (terrain){
+            case HILLS -> {
+                return brick;
             }
+            case FOREST -> {
+                return lumber;
+            }
+            case MOUNTAINS -> {
+                return ore;
+            }
+            case FIELDS -> {
+                return grain;
+            }
+            case PASTURE -> {
+                return wool;
+            }
+        }
+        return null;
+    }
+    private Structure mapBuilding(BuildingContainer.Building building){
+        switch (building){
             case City -> {
-                cities_left--;
-                cities++;
+                return cities;
+            }
+            case Settlement -> {
+                return settlements;
             }
             case Road -> {
-                roads_left--;
-                roads++;
+                return roads;
             }
         }
+        return null;
     }
+
 
     //region Get and Set
-    public int getBrick() {
-        return brick;
+    public int getResource(Tile.Terrain ter){
+        return mapTerrains(ter).getAmount();
     }
 
-    public void setBrick(int brick) {
-        this.brick += brick;
-    }
-
-    public int getLumber() {
-        return lumber;
-    }
-
-    public void setLumber(int lumber) {
-        this.lumber += lumber;
-    }
-
-    public int getOre() {
-        return ore;
-    }
-
-    public void setOre(int ore) {
-        this.ore += ore;
-    }
-
-    public int getGrain() {
-        return grain;
-    }
-
-    public int getSettlements() {
-        return settlements;
-    }
-    public void setSettlements(int settlements) {
-        this.settlements = settlements;
-    }
-
-    public int getCities() {
-        return cities;
-    }
-
-    public void setCities(int cities) {
-        this.cities = cities;
-    }
-
-    public int getRoads() {
-        return roads;
-    }
-
-    public void setRoads(int roads) {
-        this.roads = roads;
-    }
-
-    public void setGrain(int grain) {
-        this.grain += grain;
-    }
-
-    public int getWool() {
-        return wool;
-    }
-
-    public void setWool(int wool) {
-        this.wool += wool;
-    }
-
-    public int getSettlements_left() {
-        return settlements_left;
-    }
-
-    public int getCities_left() {
-        return cities_left;
-    }
-
-    public int getRoads_left() {
-        return roads_left;
+    public void setResource(Tile.Terrain ter, int amount){
+        mapTerrains(ter).setAmount(amount);
     }
     public int getTotalResources(){
-        return brick + lumber + ore + grain + wool;
+        int val = 0;
+        for(Resource res: resources){
+            val += res.getAmount();
+        }
+        return val;
     }
-    public Tile.Resource getRandomResource(){
-        int totalResources = getTotalResources();
-        int rng = new Random().nextInt(totalResources)+1;
-        if(rng>(totalResources-=wool)){
-            return Tile.Resource.PASTURE;
+    public Resource getRandomResource(){
+        if(getTotalResources() == 0){
+            return null;
         }
-        if(rng>(totalResources-=grain)){
-            return Tile.Resource.FIELDS;
+        int rng = new Random().nextInt(getTotalResources()) + 1;
+        for(Resource res:resources){
+            if(rng <= res.getAmount()){
+                return res;
+            }
+            rng -= res.getAmount();
         }
-        if(rng>(totalResources-=ore)){
-            return Tile.Resource.MOUNTAINS;
-        }
-        if(rng>(totalResources-=lumber)){
-            return Tile.Resource.FOREST;
-        }
-        return Tile.Resource.HILLS;
+        return null;
     }
     //endregion
 }

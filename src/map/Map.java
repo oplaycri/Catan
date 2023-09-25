@@ -58,7 +58,7 @@ public class Map {
         for(Tile t:tiles) {
             Tile[] neighbours = t.getNeighbours();
             for (int i = 0; i < neighbours.length; i++) {
-                if (neighbours[i].getResource() == Tile.Resource.WATER) {
+                if (neighbours[i].getTerrain() == Tile.Terrain.WATER) {
                     coastalEdges.add(t.getEdges()[i]);
                 }
             }
@@ -97,10 +97,10 @@ public class Map {
                 continue;
             }
             neighbours[i] = getNewTile();
-            if (neighbours[i].getResource() != Tile.Resource.WATER){
+            if (neighbours[i].getTerrain() != Tile.Terrain.WATER){
                 tiles.add(neighbours[i]);
             }
-            if (neighbours[i].getResource() == Tile.Resource.DESERT){
+            if (neighbours[i].getTerrain() == Tile.Terrain.DESERT){
                 neighbours[i].setHasRobber(true);
             }
             // Determine where t would be indexed at neighbours[i].neighbours and filling the entry with t
@@ -120,27 +120,27 @@ public class Map {
         Random random = new Random();
         int total_left = hills_left + mountains_left + forests_left + fields_left + pastures_left + deserts_left;
         if (total_left == 0) {
-            return new Tile(Tile.Resource.WATER);
+            return new Tile(Tile.Terrain.WATER);
         }
         int tileNumber = random.nextInt(total_left) + 1; // +1 makes it easier to match
-        Tile.Resource resource;
+        Tile.Terrain resource;
         if (tileNumber >= (total_left = total_left - deserts_left)) {
-            resource = Tile.Resource.DESERT;
+            resource = Tile.Terrain.DESERT;
             deserts_left--;
         } else if (tileNumber >= (total_left = total_left - pastures_left)) {
-            resource = Tile.Resource.PASTURE;
+            resource = Tile.Terrain.PASTURE;
             pastures_left--;
         } else if (tileNumber >= (total_left = total_left - fields_left)) {
-            resource = Tile.Resource.FIELDS;
+            resource = Tile.Terrain.FIELDS;
             fields_left--;
         } else if (tileNumber >= (total_left = total_left - forests_left)) {
-            resource = Tile.Resource.FOREST;
+            resource = Tile.Terrain.FOREST;
             forests_left--;
         } else if (tileNumber >= (total_left = total_left - mountains_left)) {
-            resource = Tile.Resource.MOUNTAINS;
+            resource = Tile.Terrain.MOUNTAINS;
             mountains_left--;
         } else {
-            resource = Tile.Resource.HILLS;
+            resource = Tile.Terrain.HILLS;
             hills_left--;
         }
         return new Tile(resource);
@@ -204,7 +204,7 @@ public class Map {
         }
     }
     private void fillNumbers(Tile t){
-        if(t.getResource() == Tile.Resource.DESERT || t.getResource() == Tile.Resource.WATER){
+        if(t.getTerrain() == Tile.Terrain.DESERT || t.getTerrain() == Tile.Terrain.WATER){
             return;
         }
         Random random = new Random();
@@ -241,25 +241,8 @@ public class Map {
                 case Settlement -> amount = 1;
                 case City -> amount = 2;
             }
-            Tile.Resource resource = t.getResource();
-            switch (resource){
-                // Set methods are in a changing/relative manner
-                case HILLS -> {
-                    owner.setBrick(amount);
-                }
-                case FOREST -> {
-                    owner.setLumber(amount);
-                }
-                case MOUNTAINS -> {
-                    owner.setOre(amount);
-                }
-                case FIELDS -> {
-                    owner.setGrain(amount);
-                }
-                case PASTURE -> {
-                    owner.setWool(amount);
-                }
-            }
+            Tile.Terrain resource = t.getTerrain();
+            owner.setResource(resource, owner.getResource(resource) + amount);
         }
     }
     // TODO Give Control over Resources to game.Game
@@ -387,10 +370,15 @@ public class Map {
         return null;
     }
 
+    public void moveRobber(Tile tile){
+        findRobber().setHasRobber(false);
+        tile.setHasRobber(true);
+    }
+
     public boolean canSteal(Player target) {
         Tile robbberTile = findRobber();
-        for (Junction junction: robbberTile.getJunctions()){
-            if(junction.getBuilding()!= null && junction.getOwner() == target){
+        for (Junction junction: robbberTile.getJunctions()) {
+            if (junction.getBuilding() != null && junction.getOwner() == target && target.getTotalResources() > 0) {
                 return true;
             }
         }

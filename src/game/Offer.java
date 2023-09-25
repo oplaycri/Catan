@@ -5,12 +5,12 @@ import map.Tile;
 public class Offer {
     Player from;
     Player to;
-    Tile.Resource offered;
+    Tile.Terrain offered;
     int amountOffered;
-    Tile.Resource requested;
+    Tile.Terrain requested;
     int amountRequested;
 
-    public Offer(Tile.Resource offered, int amountOffered, Tile.Resource requested, int amountRequested) {
+    public Offer(Tile.Terrain offered, int amountOffered, Tile.Terrain requested, int amountRequested) {
         this.offered = offered;
         this.amountOffered = amountOffered;
         this.requested = requested;

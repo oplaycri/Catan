@@ -137,7 +137,7 @@ public class Game {
         return true;
     }
 
-    public boolean tradeOverseas(Player player, Tile.Resource sold, Tile.Resource bought) {
+    public boolean tradeOverseas(Player player, Tile.Terrain sold, Tile.Terrain bought) {
         return true;
     }
 
@@ -148,6 +148,7 @@ public class Game {
         if (tile == map.findRobber()) {
             return false;
         }
+        map.moveRobber(Tile tile);
         for (Player p : players) {
             if (p != player && map.canSteal(p)) {
                 state = State.STEAL;
@@ -167,11 +168,15 @@ public class Game {
     }
 
     public boolean steal(Player player, Player target) {
-        if (player==target || !map.canSteal(target)) {
+        if (state!=State.STEAL || player != players[curPlayer] || player==target || !map.canSteal(target)) {
             return false;
         }
 
         return true;
+    }
+
+    public Map getMap() {
+        return map;
     }
 
     private boolean checkWin(Player player) {
@@ -188,4 +193,5 @@ public class Game {
         STEAL,
         TURN, WON
     }
+
 }

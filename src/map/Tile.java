@@ -10,11 +10,11 @@ public class Tile {
     private final Tile[] neighbours = new Tile[6]; // Beginning at the top (right) and going clockwise
     private final Junction[] junctions = new Junction[6]; // Beginning at the top (right) and going clockwise
     private final Edge[] edges = new Edge[6]; // Beginning at the top (right) and going clockwise
-    private final Resource resource;
+    public final Terrain terrain;
     private int n = -1;
     private boolean hasRobber = false;
-    public Tile(Resource resource) {
-        this.resource = resource;
+    public Tile(Terrain terrain) {
+        this.terrain = terrain;
     }
 
     public Junction[] getJunctions() {
@@ -27,10 +27,6 @@ public class Tile {
 
     public Edge[] getEdges() {
         return edges;
-    }
-
-    public Resource getResource() {
-        return resource;
     }
 
     public int getN() {
@@ -49,7 +45,7 @@ public class Tile {
         this.hasRobber = hasRobber;
     }
 
-    public enum Resource {
+    public enum Terrain {
         HILLS,
         FOREST,
         MOUNTAINS,
