@@ -18,6 +18,7 @@ public class Game {
         players = new Player[playNum];
         curPlayer = random.nextInt(playNum);
         state = State.INIT;
+        init();
     }
 
     /**
@@ -195,6 +196,7 @@ public class Game {
         INITIAL_PLACEMENT_1,
         INITIAL_PLACEMENT_2,
         DICE_ROLL,
+        GIVE_ROBBER,
         MOVE_ROBBER,
         STEAL,
         TURN, WON
