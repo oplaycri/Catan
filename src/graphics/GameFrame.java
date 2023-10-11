@@ -8,12 +8,12 @@ public class GameFrame extends JFrame {
     public GameFrame(){
         setTitle("Catan");
         getContentPane().setLayout(null);
-        setBackground(new Color(31, 49, 28));
+        getContentPane().setBackground(new Color(31, 49, 28));
         setExtendedState(MAXIMIZED_BOTH);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
 
-        //gamePanel = new GamePanel();
-
+        gamePanel = new GamePanel();
+        add(gamePanel);
         setVisible(true);
     }
 }

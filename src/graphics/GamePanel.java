@@ -2,15 +2,22 @@ package graphics;
 
 import game.Game;
 import map.Map;
+import map.Tile;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.LinkedList;
 
 public class GamePanel extends JPanel {
     Game game;
     Map map;
     public GamePanel(){
+        setBounds(40, 40, 800, 800);
+        setBackground(new Color(0, 0, 0));
         game = new Game(3);
         map = game.getMap();
     }
@@ -23,62 +30,37 @@ public class GamePanel extends JPanel {
         int height = getHeight();
         int widthTile = width/5;
         int heightTile = height/5;
-        LinkedList<Polygon> polygons = new LinkedList<>();
-
-        for (Polygon hex: polygons){
-            g2D.clip(hex);
-            switch ()
-            g2D.drawImage(s);
+        double angle = (Math.PI - (4.0/6.0 * Math.PI))/2;
+        int alignY = (int) ((widthTile/2.0)*Math.tan(angle));
+        int offsetX =width/2 - widthTile/2;
+        int offsetY =height/2 - heightTile/2;
+        int x,y;
+        BufferedImage test = null;
+        try {
+            test = ImageIO.read(new File("src/resources/Pasture.png"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-    }
-
-    private void fillPolygons(LinkedList<Polygon> polygons, int widthTile, int heightTile){
-        double angle = Math.PI - (1.0/6.0 * 2 * Math.PI);
-        double alignYPercentage =  1/Math.tan(angle);
-        int alignY = (int) (alignYPercentage * heightTile);
-        int x = 3 * widthTile / 2;
-        int y = 0;
-        for (int i = 0; i < 3; i++) {
-            polygons.add(getHexagon(x, y, widthTile, heightTile));
-            x += widthTile;
-        }
-        x = widthTile/2;
-        y += heightTile - alignY;
-        for (int i = 0; i < 4; i++) {
-            polygons.add(getHexagon(x, y, widthTile, heightTile));
-            x += widthTile;
-        }
-        x = 0;
-        y += heightTile - alignY;
-        for (int i = 0; i < 5; i++) {
-            polygons.add(getHexagon(x, y, widthTile, heightTile));
-            x += widthTile;
-        }
-        x = widthTile/2;
-        y += heightTile - alignY;
-        for (int i = 0; i < 4; i++) {
-            polygons.add(getHexagon(x, y, widthTile, heightTile));
-            x += widthTile;
-        }
-        x = 3 * widthTile / 2;
-        y += heightTile - alignY;
-        for (int i = 0; i < 3; i++) {
-            polygons.add(getHexagon(x, y, widthTile, heightTile));
-            x += widthTile;
+        for (Tile t: map.getTiles()){
+            x = t.x * widthTile + t.y * widthTile/2 + offsetX;
+            y = t.y * (heightTile - alignY) + offsetY;
+            g2D.setClip(getHexagon(x, y, widthTile, heightTile));
+            g2D.drawImage(test, x, y, widthTile, heightTile, null);
+            System.out.println("huh");
         }
     }
 
     private Polygon getHexagon(int x, int y, int width, int height){
         Polygon val = new Polygon();
-        double angle = Math.PI - (1.0/6.0 * 2 * Math.PI);
-        double alignYPercentage =  1/Math.tan(angle);
-        int alignY = (int) (alignYPercentage * height);
+        double angle = (Math.PI - (4.0/6.0 * Math.PI))/2;
+        int alignY = (int) ((width/2.0)*Math.tan(angle));
+        // Order is important
         val.addPoint(x + width/2, y);
-        val.addPoint(x, y+ alignY);
         val.addPoint(x + width, y + alignY);
-        val.addPoint(x, y+height-alignY);
         val.addPoint(x + width, y+height-alignY);
         val.addPoint(x + width/2, y+height);
+        val.addPoint(x, y+height-alignY);
+        val.addPoint(x, y+ alignY);
         return val;
     }
 }
