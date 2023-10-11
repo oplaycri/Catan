@@ -3,6 +3,7 @@ package map;
 import game.Player;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Random;
 
@@ -11,11 +12,11 @@ public class Map {
     // Used for getting a new Tile/Harbor. Will be 0 at the end of initialization
     private int specialHarbors_left = 5;
     private int genericHarbors_left = 4;
-    private int hills_left, mountains_left = 3;
-    private int forests_left, fields_left, pastures_left = 4;
+    private int hills_left = 3, mountains_left = 3;
+    private int forests_left = 4, fields_left = 4, pastures_left = 4;
     private int deserts_left = 1;
     // Used for getting a new number for a tile. Will be empty after initialization
-    LinkedList<Integer> numbers = (LinkedList<Integer>) Arrays.asList(2, 3, 3, 4, 4, 5, 5, 6, 6, 8, 8, 9, 9, 10, 10, 11, 11, 12);
+    LinkedList<Integer> numbers = new LinkedList<>();
     // Stores all the tiles, beginning at the center, then the first layer, then the second.
     // Does not include water tiles
     LinkedList<Tile> tiles = new LinkedList<>();
@@ -26,28 +27,32 @@ public class Map {
      * Shall be called first.
      * */
     public void init() {
-        Tile start = getNewTile();
+        Collections.addAll(numbers,2, 3, 3, 4, 4, 5, 5, 6, 6, 8, 8, 9, 9, 10, 10, 11, 11, 12);
+        Tile start = new Tile(getNewTerrain(), 0, 0);
         tiles.add(start);
         // Inserting all the Tiles into a Graph-structure
         // Adding the first layer
         fillSurroundingTiles(start);
+        LinkedList<Tile> temp = (LinkedList<Tile>) tiles.clone();
         // Adding the second layer
-        for (Tile tile : tiles) {
+        for (Tile tile : temp) {
             fillSurroundingTiles(tile);
         }
+        temp = (LinkedList<Tile>) tiles.clone();
         // Adding water tiles (third layer)
-        for (Tile tile : tiles) {
+        for (Tile tile : temp) {
             fillSurroundingTiles(tile);
         }
-
-        for (Tile tile : tiles) {
+        temp = (LinkedList<Tile>) tiles.clone();
+        for (Tile tile : temp) {
             fillJunctions(tile);
         }
-        for (Tile tile : tiles) {
+        temp = (LinkedList<Tile>) tiles.clone();
+        for (Tile tile : temp) {
             fillEdges(tile);
         }
-        
-        for (Tile tile : tiles) {
+        temp = (LinkedList<Tile>) tiles.clone();
+        for (Tile tile : temp) {
             fillNumbers(tile);
         }
         fillHarbors();
@@ -85,6 +90,9 @@ public class Map {
         }
     }
 
+    public LinkedList<Tile> getTiles() {
+        return tiles;
+    }
 
     /**
      * Fills t.neighbours with new tiles.
@@ -92,11 +100,36 @@ public class Map {
      * */
     private void fillSurroundingTiles(Tile t) {
         Tile[] neighbours = t.getNeighbours();
+        int x, y;
         for (int i = 0; i < neighbours.length; i++) {
+            x = t.x;
+            y = t.y;
             if (neighbours[i] != null) {
                 continue;
             }
-            neighbours[i] = getNewTile();
+            switch (i){
+                case 0 -> {
+                    x++;
+                    y--;
+                }
+                case 1 -> {
+                    x++;
+                }
+                case 2 -> {
+                    y++;
+                }
+                case 3 -> {
+                    x--;
+                    y++;
+                }
+                case 4 -> {
+                    x--;
+                }
+                case 5 -> {
+                    y--;
+                }
+            }
+            neighbours[i] = new Tile(getNewTerrain(), x, y);
             if (neighbours[i].terrain!= Tile.Terrain.WATER){
                 tiles.add(neighbours[i]);
             }
@@ -111,18 +144,18 @@ public class Map {
         fillNeighbours(t);
     }
     /**
-     * Builds a new tile with one of the possible resources, limited by the
+     * Returns a Resource for a new Tile, limited by the
      * corresponding *_left attributes and adds it to tiles, decrementing the
      * corresponding *_left attribute.
      * If no more possible resources are left, WATER shall be returned.
      */
-    private Tile getNewTile() {
+    private Tile.Terrain getNewTerrain() {
         Random random = new Random();
         int total_left = hills_left + mountains_left + forests_left + fields_left + pastures_left + deserts_left;
         if (total_left == 0) {
-            return new Tile(Tile.Terrain.WATER);
+            return Tile.Terrain.WATER;
         }
-        int tileNumber = random.nextInt(total_left) + 1; // +1 makes it easier to match
+        int tileNumber = random.nextInt(total_left);
         Tile.Terrain resource;
         if (tileNumber >= (total_left = total_left - deserts_left)) {
             resource = Tile.Terrain.DESERT;
@@ -143,7 +176,7 @@ public class Map {
             resource = Tile.Terrain.HILLS;
             hills_left--;
         }
-        return new Tile(resource);
+        return resource;
     }
     /**
      * Shall be called after t filled its neighbours.
