@@ -49,13 +49,5 @@ public class Tile {
         this.hasRobber = hasRobber;
     }
 
-    public enum Terrain {
-        HILLS,
-        FOREST,
-        MOUNTAINS,
-        FIELDS,
-        PASTURE,
-        DESERT,
-        WATER
-    }
+
 }

@@ -8,6 +8,8 @@ import map.Tile;
 
 import java.util.Random;
 
+import map.Building;
+
 public class Player {
     // Set methods will be in a changing/relative manner
     LinkedList<Resource> resources = new LinkedList<>();
@@ -16,7 +18,7 @@ public class Player {
             wool = new Resource("wool", 0);
     private Structure cities = new Structure("City", 4), settlements = new Structure("Settlement", 5),
             roads = new Structure("roads", 15);
-    LinkedList<BuildingContainer> buildings = new LinkedList<>();
+    LinkedList<BuildingContainer> buildingContainers = new LinkedList<>();
     LinkedList<Structure> structures = new LinkedList<>();
 
     public Player() {
@@ -32,7 +34,7 @@ public class Player {
     }
 
     public void addBuildingContainerAndUpdate(BuildingContainer b){
-        buildings.add(b);
+        buildingContainers.add(b);
         Structure s = mapBuilding(b.getBuilding());
         s.setAmount(s.getAmount() + 1);
         s.setLeft(s.getLeft() - 1);
@@ -60,7 +62,7 @@ public class Player {
         }
         return null;
     }
-    private Structure mapBuilding(BuildingContainer.Building building){
+    private Structure mapBuilding(Building building){
         switch (building){
             case City -> {
                 return cities;

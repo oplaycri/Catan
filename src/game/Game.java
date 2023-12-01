@@ -1,8 +1,11 @@
 package game;
 
+
 import map.BuildingContainer;
 import map.Map;
 import map.Tile;
+import map.Building;
+import static map.Building.*;
 
 import java.util.Random;
 
@@ -37,7 +40,7 @@ public class Game {
     /**
      * Round 1 of initial placement
      */
-    private boolean initialPlacement1(Player player, BuildingContainer.Building b, BuildingContainer container) {
+    private boolean initialPlacement1(Player player, Building b, BuildingContainer container) {
         if (players[curPlayer] != player) {
             return false;
         }

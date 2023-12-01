@@ -149,11 +149,11 @@ public class Map {
      * corresponding *_left attribute.
      * If no more possible resources are left, WATER shall be returned.
      */
-    private Tile.Terrain getNewTerrain() {
+    private Terrain getNewTerrain() {
         Random random = new Random();
         int total_left = hills_left + mountains_left + forests_left + fields_left + pastures_left + deserts_left;
         if (total_left == 0) {
-            return Tile.Terrain.WATER;
+            return WATER;
         }
         int tileNumber = random.nextInt(total_left);
         Tile.Terrain resource;
@@ -264,7 +264,7 @@ public class Map {
         }
         Junction[] junctions = t.getJunctions();
         for (Junction j: junctions){
-            BuildingContainer.Building building = j.getBuilding();
+            Building building = j.getBuilding();
             if(building == null){
                 continue;
             }
@@ -279,10 +279,10 @@ public class Map {
         }
     }
     // TODO Give Control over Resources to game.Game
-    public void placeBuilding(BuildingContainer.Building b, BuildingContainer container, Player owner){
+    public void placeBuilding(Building b, BuildingContainer container, Player owner){
         container.placeBuilding(b, owner);
     }
-    public boolean checkValidPlacement(BuildingContainer.Building b, BuildingContainer container, Player owner, boolean isInit){
+    public boolean checkValidPlacement(Building b, BuildingContainer container, Player owner, boolean isInit){
         switch (b){
             case City -> {
                 return checkValidCity(container, owner);
