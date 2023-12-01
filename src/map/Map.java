@@ -2,10 +2,12 @@ package map;
 
 import game.Player;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Random;
+
+import static map.Building.*;
+import static map.Terrain.*;
 
 public class Map {
 
@@ -63,7 +65,7 @@ public class Map {
         for(Tile t:tiles) {
             Tile[] neighbours = t.getNeighbours();
             for (int i = 0; i < neighbours.length; i++) {
-                if (neighbours[i].terrain == Tile.Terrain.WATER) {
+                if (neighbours[i].terrain == WATER) {
                     coastalEdges.add(t.getEdges()[i]);
                 }
             }
@@ -130,10 +132,10 @@ public class Map {
                 }
             }
             neighbours[i] = new Tile(getNewTerrain(), x, y);
-            if (neighbours[i].terrain!= Tile.Terrain.WATER){
+            if (neighbours[i].terrain!= WATER){
                 tiles.add(neighbours[i]);
             }
-            if (neighbours[i].terrain == Tile.Terrain.DESERT){
+            if (neighbours[i].terrain == DESERT){
                 neighbours[i].setHasRobber(true);
             }
             // Determine where t would be indexed at neighbours[i].neighbours and filling the entry with t
@@ -156,24 +158,24 @@ public class Map {
             return WATER;
         }
         int tileNumber = random.nextInt(total_left);
-        Tile.Terrain resource;
+        Terrain resource;
         if (tileNumber >= (total_left = total_left - deserts_left)) {
-            resource = Tile.Terrain.DESERT;
+            resource = DESERT;
             deserts_left--;
         } else if (tileNumber >= (total_left = total_left - pastures_left)) {
-            resource = Tile.Terrain.PASTURE;
+            resource = PASTURE;
             pastures_left--;
         } else if (tileNumber >= (total_left = total_left - fields_left)) {
-            resource = Tile.Terrain.FIELDS;
+            resource = FIELDS;
             fields_left--;
         } else if (tileNumber >= (total_left = total_left - forests_left)) {
-            resource = Tile.Terrain.FOREST;
+            resource = FOREST;
             forests_left--;
         } else if (tileNumber >= (total_left = total_left - mountains_left)) {
-            resource = Tile.Terrain.MOUNTAINS;
+            resource = MOUNTAINS;
             mountains_left--;
         } else {
-            resource = Tile.Terrain.HILLS;
+            resource = HILLS;
             hills_left--;
         }
         return resource;
@@ -237,7 +239,7 @@ public class Map {
         }
     }
     private void fillNumbers(Tile t){
-        if(t.terrain == Tile.Terrain.DESERT || t.terrain == Tile.Terrain.WATER){
+        if(t.terrain == DESERT || t.terrain == WATER){
             return;
         }
         Random random = new Random();
@@ -274,7 +276,7 @@ public class Map {
                 case Settlement -> amount = 1;
                 case City -> amount = 2;
             }
-            Tile.Terrain resource = t.terrain;
+            Terrain resource = t.terrain;
             owner.setResource(resource, owner.getResource(resource) + amount);
         }
     }
@@ -388,7 +390,7 @@ public class Map {
             return false;
         }
 
-        if(junction.getBuilding() != BuildingContainer.Building.Settlement){
+        if(junction.getBuilding() != Settlement){
             return false;
         }
         return true;

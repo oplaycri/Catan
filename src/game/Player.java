@@ -9,6 +9,9 @@ import map.Tile;
 import java.util.Random;
 
 import map.Building;
+import map.Building.*;
+import map.Terrain;
+import map.Terrain.*;
 
 public class Player {
     // Set methods will be in a changing/relative manner
@@ -42,7 +45,7 @@ public class Player {
     /**
      * Map Tile.Resource to the corresponding int variables. DESERT and WATER not specified
      * */
-    private Resource mapTerrains(Tile.Terrain terrain){
+    private Resource mapTerrains(Terrain terrain){
         switch (terrain){
             case HILLS -> {
                 return brick;
@@ -79,11 +82,11 @@ public class Player {
 
 
     //region Get and Set
-    public int getResource(Tile.Terrain ter){
+    public int getResource(Terrain ter){
         return mapTerrains(ter).getAmount();
     }
 
-    public void setResource(Tile.Terrain ter, int amount){
+    public void setResource(Terrain ter, int amount){
         mapTerrains(ter).setAmount(amount);
     }
     public int getTotalResources(){
@@ -114,7 +117,7 @@ public class Player {
         }
         return null;
     }
-    public Structure getStructure(BuildingContainer.Building b){
+    public Structure getStructure(Building b){
         return mapBuilding(b);
     }
     //endregion

@@ -1,10 +1,8 @@
 package game;
 
 
-import map.BuildingContainer;
-import map.Map;
-import map.Tile;
-import map.Building;
+import map.*;
+
 import static map.Building.*;
 
 import java.util.Random;
@@ -74,7 +72,7 @@ public class Game {
     /**
      * Round 2 of initial placement
      */
-    private boolean initialPlacement2(Player player, BuildingContainer.Building b, BuildingContainer container) {
+    private boolean initialPlacement2(Player player, Building b, BuildingContainer container) {
         if (players[curPlayer] != player) {
             return false;
         }
@@ -131,7 +129,7 @@ public class Game {
         return true;
     }
 
-    public boolean place(Player player, BuildingContainer.Building b, BuildingContainer container) {
+    public boolean place(Player player, Building b, BuildingContainer container) {
         if (state == State.INITIAL_PLACEMENT_1) {
             return initialPlacement1(player, b, container);
         }
@@ -141,7 +139,7 @@ public class Game {
         return true;
     }
 
-    public boolean tradeOverseas(Player player, Tile.Terrain sold, Tile.Terrain bought) {
+    public boolean tradeOverseas(Player player, Terrain sold, Terrain bought) {
         return true;
     }
 
