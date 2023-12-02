@@ -1,16 +1,18 @@
 package game;
 
 import map.Tile;
+import map.Terrain;
+import static map.Terrain.*;
 
 public class Offer {
     Player from;
     Player to;
-    Tile.Terrain offered;
+    Terrain offered;
     int amountOffered;
-    Tile.Terrain requested;
+    Terrain requested;
     int amountRequested;
 
-    public Offer(Tile.Terrain offered, int amountOffered, Tile.Terrain requested, int amountRequested) {
+    public Offer(Terrain offered, int amountOffered, Terrain requested, int amountRequested) {
         this.offered = offered;
         this.amountOffered = amountOffered;
         this.requested = requested;

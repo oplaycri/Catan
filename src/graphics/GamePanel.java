@@ -3,6 +3,8 @@ package graphics;
 import game.Game;
 import map.Map;
 import map.Tile;
+import map.Terrain;
+import static map.Terrain.*;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -15,7 +17,7 @@ import java.util.LinkedList;
 public class GamePanel extends JPanel {
     Game game;
     Map map;
-    BufferedImage images[] = new BufferedImage[Tile.Terrain.values().length];
+    BufferedImage images[] = new BufferedImage[Terrain.values().length];
     public GamePanel(){
         setBounds(40, 40, 800, 800);
         setBackground(new Color(0, 0, 0));
@@ -26,13 +28,13 @@ public class GamePanel extends JPanel {
 
     private void initImages() {
         try {
-            images[Tile.Terrain.DESERT.ordinal()] = ImageIO.read(new File("src/resources/Desert.png"));
-            images[Tile.Terrain.FIELDS.ordinal()] = ImageIO.read(new File("src/resources/Fields.png"));
-            images[Tile.Terrain.FOREST.ordinal()] = ImageIO.read(new File("src/resources/Forest.png"));
-            images[Tile.Terrain.HILLS.ordinal()] = ImageIO.read(new File("src/resources/Hills.png"));
-            images[Tile.Terrain.MOUNTAINS.ordinal()] = ImageIO.read(new File("src/resources/Mountains.png"));
-            images[Tile.Terrain.PASTURE.ordinal()] = ImageIO.read(new File("src/resources/Pasture.png"));
-            images[Tile.Terrain.WATER.ordinal()] = ImageIO.read(new File("src/resources/Water.png"));
+            images[DESERT.ordinal()] = ImageIO.read(new File("src/resources/Desert.png"));
+            images[FIELDS.ordinal()] = ImageIO.read(new File("src/resources/Fields.png"));
+            images[FOREST.ordinal()] = ImageIO.read(new File("src/resources/Forest.png"));
+            images[HILLS.ordinal()] = ImageIO.read(new File("src/resources/Hills.png"));
+            images[MOUNTAINS.ordinal()] = ImageIO.read(new File("src/resources/Mountains.png"));
+            images[PASTURE.ordinal()] = ImageIO.read(new File("src/resources/Pasture.png"));
+            images[WATER.ordinal()] = ImageIO.read(new File("src/resources/Water.png"));
         } catch (Exception e){
 
         }
