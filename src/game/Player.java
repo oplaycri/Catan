@@ -4,14 +4,10 @@ import map.BuildingContainer;
 
 import java.util.LinkedList;
 
-import map.Tile;
-
 import java.util.Random;
 
 import map.Building;
-import map.Building.*;
 import map.Terrain;
-import map.Terrain.*;
 
 public class Player {
     // Set methods will be in a changing/relative manner
@@ -67,13 +63,13 @@ public class Player {
     }
     private Structure mapBuilding(Building building){
         switch (building){
-            case City -> {
+            case CITY -> {
                 return cities;
             }
-            case Settlement -> {
+            case SETTLEMENT -> {
                 return settlements;
             }
-            case Road -> {
+            case ROAD -> {
                 return roads;
             }
         }

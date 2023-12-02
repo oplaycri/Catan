@@ -1,7 +1,9 @@
 package map;
-
+/**
+ * Represent the 3 types of buildings in Catan.
+ * */
 public enum Building{
-    Settlement,
-    City,
-    Road
+    SETTLEMENT,
+    CITY,
+    ROAD
 }

@@ -1,5 +1,7 @@
 package map;
-
+/**
+ * Represents the 7 terrains in Catan, even Water.
+ * */
 public enum Terrain {
     HILLS,
     FOREST,

@@ -9,6 +9,14 @@ import java.util.Random;
 import static map.Building.*;
 import static map.Terrain.*;
 
+/**
+ * Simulates the Catan board.
+ * <p>
+ * This class can not do actions by herself, only on behalf of {@link game.Game}.
+ * It simulates all 6 (7 with water) Tile types and is responsible for generating a random, but coherent
+ * map, updating Resources, moving the robber, checking conditions for buildings and generally offering
+ * methods for the game logic.
+ * */
 public class Map {
 
     // Used for getting a new Tile/Harbor. Will be 0 at the end of initialization
@@ -26,7 +34,7 @@ public class Map {
 
     /**
      * Initializes the tiles of the map, their junctions, paths and numbers, as well as the robber.
-     * Shall be called first.
+     * Must be called first.
      * */
     public void init() {
         Collections.addAll(numbers,2, 3, 3, 4, 4, 5, 5, 6, 6, 8, 8, 9, 9, 10, 10, 11, 11, 12);
@@ -146,10 +154,10 @@ public class Map {
         fillNeighbours(t);
     }
     /**
-     * Returns a Resource for a new Tile, limited by the
-     * corresponding *_left attributes and adds it to tiles, decrementing the
-     * corresponding *_left attribute.
-     * If no more possible resources are left, WATER shall be returned.
+     * Returns a random Resource for a new Tile.
+     *
+     * @return A terrain. If no more possible terrains are left, WATER will be returned.
+     * @see {@link Terrain}
      */
     private Terrain getNewTerrain() {
         Random random = new Random();
@@ -249,6 +257,9 @@ public class Map {
     }
     /**
      * Updates player resources for every tile and player.
+     *
+     * @param diceRoll a value between 2 and 12, but not containing 7.
+     *                 It is used for identifying Tiles with that number.
      * */
     public void updateResources(int diceRoll){
         for (Tile t: tiles){
@@ -256,9 +267,12 @@ public class Map {
         }
     }
     /**
-     * Updates player resources for t.
+     * Updates player resources for a single Tile.
+     * <p>
      * For each Building in t's junctions the owner of said building will get an according amount of resources
      * (brick, lumber, ore, grain or wool) (+1 or +2).
+     *
+     * @param t the tile, which will be used for updating resources.
      * */
     private void updateResourceTile(Tile t, int diceRoll){
         if (t.HasRobber()||t.getN()==-1||t.getN()!=diceRoll){
@@ -273,8 +287,8 @@ public class Map {
             Player owner = j.getOwner();
             int amount = 0;
             switch (building){
-                case Settlement -> amount = 1;
-                case City -> amount = 2;
+                case SETTLEMENT -> amount = 1;
+                case CITY -> amount = 2;
             }
             Terrain resource = t.terrain;
             owner.setResource(resource, owner.getResource(resource) + amount);
@@ -286,13 +300,13 @@ public class Map {
     }
     public boolean checkValidPlacement(Building b, BuildingContainer container, Player owner, boolean isInit){
         switch (b){
-            case City -> {
+            case CITY -> {
                 return checkValidCity(container, owner);
             }
-            case Settlement -> {
+            case SETTLEMENT -> {
                 return checkValidSettlement(container, owner, isInit);
             }
-            case Road -> {
+            case ROAD -> {
                 return checkValidRoad(container, owner);
             }
         }
@@ -390,7 +404,7 @@ public class Map {
             return false;
         }
 
-        if(junction.getBuilding() != Settlement){
+        if(junction.getBuilding() != SETTLEMENT){
             return false;
         }
         return true;
