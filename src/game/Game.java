@@ -51,23 +51,62 @@ public class Game {
 	 * Determines the state of the game and acts accordingly.
 	 * There will be no modification of the game on rejection.
 	 *
-	 * @param player the requesting Player
-	 * @param b the building to be placed
+	 * @param player    the requesting Player
+	 * @param b         the building to be placed
 	 * @param container the container
-	 * @return true if allowed, false otherwise. Does nothing on false
+	 * @return true if allowed, false otherwise.
 	 */
 	public boolean place(Player player, Building b, BuildingContainer container) {
+		// Initial Placement
 		if (state == INITIAL_PLACEMENT_1) {
 			return initialPlacement(player, b, container, 1);
 		}
 		if (state == INITIAL_PLACEMENT_2) {
 			return initialPlacement(player, b, container, 2);
 		}
+		// During turns
+		if (state != TURN || player != players[curPlayer]) {
+			return false;
+		}
+
+		// Check for expected building
+		Structure s = player.getStructure(b);
+		int[] required;
+
+		switch (b) {
+			case SETTLEMENT -> {
+				required = new int[]{1, 1, 0, 1, 1};
+			}
+			case ROAD -> {
+				required = new int[]{1, 1, 0, 0, 0};
+			}
+			case CITY -> {
+				required = new int[]{0, 0, 3, 2, 0};
+			}
+			default -> {
+				return false;
+			}
+		}
+
+		if(!player.hasResources(required)){
+			return false;
+		}
+		// Check position
+		if (!map.checkValidPlacement(b, container, player, false)) {
+			return false;
+		}
+
+		map.placeBuilding(b, container, player);
+
 		return false; //TODO Implement other state cases
 	}
 
 	/**
-	 * Round 2 of initial placement.
+	 * Simulates initial Placement (no resource costs)
+	 * <p>
+	 * Places the building into the building container and sets ownership to the requesting player.
+	 * In the initial phase there are no resource costs for buildings (settlements and roads) and the second round
+	 * will go "counterclockwise"
 	 *
 	 * @param round expect 1 or 2
 	 * @see Game#place(Player, Building, BuildingContainer)
@@ -78,7 +117,7 @@ public class Game {
 		}
 		// Check for expected building
 		Structure s = player.getStructure(b);
-		if(round == 1) {
+		if (round == 1) {
 			switch (b) {
 				case SETTLEMENT -> {
 					if (s.getLeft() != s.INITIAL_LEFT - (round - 1)) {
@@ -101,7 +140,7 @@ public class Game {
 		if (!map.checkValidPlacement(b, container, player, true)) {
 			return false;
 		}
-		//TODO Place the damn building
+		map.placeBuilding(b, container, player);
 
 		// Used for determining end. 1 full turn => switch. Do not change the current player.
 		initCounter++;
@@ -111,7 +150,7 @@ public class Game {
 			return true;
 		}
 		// Clockwise or counterclockwise
-		if(round == 1) {
+		if (round == 1) {
 			curPlayer = (curPlayer + 1) % players.length;
 		} else {
 			curPlayer = (curPlayer - 1) % players.length;
@@ -121,44 +160,10 @@ public class Game {
 	}
 
 	/**
-	 * Round 2 of initial placement.
-	 *
-	 * @see Game#place(Player, Building, BuildingContainer)
-	 */
-	private boolean initialPlacement2(Player player, Building b, BuildingContainer container) {
-		if (players[curPlayer] != player) {
-			return false;
-		}
-		switch (b) {
-			case SETTLEMENT -> {
-				if (player.getStructure(b).getLeft() != 5) {
-					return false;
-				}
-			}
-			case ROAD -> {
-				if (player.getStructure(b).getLeft() != 15 || player.getStructure(b).getLeft() != 4) {
-					return false;
-				}
-
-			}
-		}
-		if (!map.checkValidPlacement(b, container, player, true)) {
-			return false;
-		}
-		initCounter++;
-		if (initCounter == players.length) {
-			state = State.DICE_ROLL;
-			return true;
-		}
-		curPlayer = (curPlayer - 1 + players.length) % players.length;
-		return true;
-	}
-
-	/**
 	 * Performs a (double-)dice roll for the game.
 	 * <p>
 	 * State transition between turns is handled here and should be called after {@link Game#endTurn(Player)}
-	 * or after {@link Game#initialPlacement2(Player, Building, BuildingContainer)}.
+	 * or after {@link Game#initialPlacement(Player, Building, BuildingContainer, int)}.
 	 * Depending on the roll, the next state will be a normal turn or "the robber's turn".
 	 *
 	 * @return True if in correct state.
@@ -180,7 +185,17 @@ public class Game {
 		return true;
 	}
 
+	/**
+	 * Ends the turn.
+	 * <p>
+	 * Transitions from TURN to DICE_ROLL and sets the next player.
+	 * */
 	public boolean endTurn(Player player) {
+		if (player != players[curPlayer] || state != TURN) {
+			return false;
+		}
+		state = DICE_ROLL;
+		curPlayer = (curPlayer + 1) % players.length;
 		return true;
 	}
 
@@ -196,6 +211,15 @@ public class Game {
 		return true;
 	}
 
+	/**
+	 * Moves the robber
+	 * <p>
+	 * Moves the robber to the tile if possible and initializes the stealing state if possible.
+	 *
+	 * @param player the requesting player.
+	 * @param tile   the new robbed tile.
+	 * @return true on success, false otherwise.
+	 */
 	public boolean moveRobber(Player player, Tile tile) {
 		if (state != MOVE_ROBBER || players[curPlayer] != player) {
 			return false;
@@ -222,6 +246,13 @@ public class Game {
 		return true;
 	}
 
+	/**
+	 * Steal from the targeted player.
+	 * <p>
+	 * Gets one random resource from the target and gives it to the player. Sets the state to TURN.
+	 *
+	 * @param target the targeted player.
+	 */
 	public boolean steal(Player player, Player target) {
 		if (state != STEAL || player != players[curPlayer] || player == target || !map.canSteal(target)) {
 			return false;
@@ -232,6 +263,7 @@ public class Game {
 		// Increment
 		res = player.getResource(res.name);
 		res.setAmount(res.getAmount() + 1);
+		state = TURN;
 
 		return true;
 	}

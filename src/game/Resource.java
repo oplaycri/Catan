@@ -9,6 +9,10 @@ public class Resource {
         this.amount = amount;
     }
 
+    public void increment(int value){
+        amount += value;
+    }
+
     public int getAmount() {
         return amount;
     }

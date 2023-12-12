@@ -4,6 +4,8 @@ Working:
 
 Work in Progress:
 - Placement of Buildings / Updating everything correctly (Implement placement in map.BuildingContainer.placeBuilding())
+
+- game.Game: everything you can do on a turn.
 (Future) Issues:
 - Map Generation for non standard boards
 - coastal Edges are badly specified (see map.Map.fillHarbors())

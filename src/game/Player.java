@@ -21,6 +21,7 @@ public class Player {
     LinkedList<Structure> structures = new LinkedList<>();
 
     public Player() {
+        // Position is important!
         resources.add(brick);
         resources.add(lumber);
         resources.add(ore);
@@ -74,6 +75,39 @@ public class Player {
             }
         }
         return null;
+    }
+
+    /**
+     * Returns whether the player has the required resources.
+     * <p>
+     *
+     * @param required array of size 5, the position specifies the resource
+     * @return true if there is enough of every resource
+     * */
+    public boolean hasResources(int[] required){
+        Resource res;
+        for (int i = 0; i<required.length; i++){
+            res = resources.get(i);
+            if (res.getAmount() < required[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Returns whether the player has the required resources.
+     * <p>
+     *
+     * @param values see {@link Player#hasResources(int[])}
+     * @return true if there is enough of every resource
+     * */
+    public void decrementResources(int[] values){
+        Resource res;
+        for (int i = 0; i<values.length; i++){
+            res = resources.get(i);
+            res.increment(- values[i]);
+        }
     }
 
 
